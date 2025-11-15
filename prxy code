@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Dark Mini Browser</title>
+<title>Dark Mini Browser With Search Engine</title>
 <style>
     body {
         margin: 0;
@@ -88,7 +88,7 @@
 
 <div id="controls">
     <button onclick="newTab()">+</button>
-    <input type="text" id="url" placeholder="Enter URL and press Enter">
+    <input type="text" id="url" placeholder="Enter URL or Search..." />
     <button onclick="goToURL()">Go</button>
 </div>
 
@@ -98,7 +98,7 @@
 let tabs = [];
 let currentTab = null;
 
-function newTab(url = "https://example.com") {
+function newTab(url = "https://duckduckgo.com") {
     const tabId = Date.now();
 
     const tab = {
@@ -113,12 +113,13 @@ function newTab(url = "https://example.com") {
     const tabButton = document.createElement("div");
     tabButton.className = "tab";
     tabButton.id = "tab-" + tabId;
-    tabButton.innerHTML = "Tab " + tabs.length + "<span class='close-btn' onclick='closeTab(event, " + tabId + ")'>×</span>";
+    tabButton.innerHTML = "Tab " + tabs.length +
+        "<span class='close-btn' onclick='closeTab(event, " + tabId + ")'>×</span>";
     tabButton.onclick = () => switchTab(tabId);
 
     document.getElementById("tab-bar").appendChild(tabButton);
-
     document.getElementById("browser-area").appendChild(tab.iframe);
+
     switchTab(tabId);
 }
 
@@ -137,8 +138,19 @@ function switchTab(id) {
 function goToURL() {
     if (!currentTab) return;
 
-    let url = document.getElementById("url").value;
-    if (!url.startsWith("http")) url = "https://" + url;
+    let input = document.getElementById("url").value.trim();
+
+    // --- SEARCH ENGINE LOGIC ---
+    let url;
+    if (input.startsWith("http://") || input.startsWith("https://")) {
+        url = input; // real URL
+    } else if (input.includes(".")) {
+        // If it looks like "example.com"
+        url = "https://" + input;
+    } else {
+        // Treat as a search query
+        url = "https://duckduckgo.com/?q=" + encodeURIComponent(input);
+    }
 
     currentTab.url = url;
     currentTab.iframe.src = url;
@@ -172,4 +184,3 @@ newTab();
 </script>
 
 </body>
-</html>
