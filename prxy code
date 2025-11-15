@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Dark Mini Browser With Search Engine</title>
+<title>Dark Mini Browser With Embeddable Search Engine</title>
 <style>
     body {
         margin: 0;
@@ -98,7 +98,8 @@
 let tabs = [];
 let currentTab = null;
 
-function newTab(url = "https://duckduckgo.com") {
+// Default tab loads embeddable search engine homepage
+function newTab(url = "https://lite.duckduckgo.com/lite/") {
     const tabId = Date.now();
 
     const tab = {
@@ -139,17 +140,17 @@ function goToURL() {
     if (!currentTab) return;
 
     let input = document.getElementById("url").value.trim();
-
-    // --- SEARCH ENGINE LOGIC ---
     let url;
+
+    // URL or search detection
     if (input.startsWith("http://") || input.startsWith("https://")) {
-        url = input; // real URL
+        url = input;
     } else if (input.includes(".")) {
-        // If it looks like "example.com"
+        // Treat it as a domain
         url = "https://" + input;
     } else {
-        // Treat as a search query
-        url = "https://duckduckgo.com/?q=" + encodeURIComponent(input);
+        // Use embeddable DuckDuckGo Lite
+        url = "https://lite.duckduckgo.com/lite/?q=" + encodeURIComponent(input);
     }
 
     currentTab.url = url;
@@ -179,8 +180,8 @@ function closeTab(event, id) {
     }
 }
 
-// Start with one tab
 newTab();
 </script>
 
 </body>
+</html>
