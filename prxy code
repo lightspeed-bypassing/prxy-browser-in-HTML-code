@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Dark Mini Browser With Startpage Search</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dark Mini Browser</title>
 <style>
     body {
         margin: 0;
@@ -10,49 +11,43 @@
         background: #0f0f0f;
         color: #eee;
         display: flex;
-    }
-
-    /* SIDEBAR */
-    #sidebar {
-        width: 55px;
-        background: #101010;
-        border-right: 1px solid #333;
         height: 100vh;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding-top: 15px;
-        transition: width 0.2s ease;
     }
 
-    #sidebar:hover {
-        width: 180px;
-    }
-
-    .side-link {
-        width: 90%;
-        background: #1a1a1a;
-        margin: 8px 0;
+    /* Sidebar for quick links */
+    #sidebar {
+        width: 200px;
+        background: #111;
         padding: 10px;
-        border-radius: 8px;
-        cursor: pointer;
-        color: white;
-        text-align: left;
-        white-space: nowrap;
-        overflow: hidden;
-        transition: background 0.2s;
+        box-sizing: border-box;
+        border-right: 1px solid #333;
     }
 
-    .side-link:hover {
-        background: #333;
+    #sidebar h3 {
+        margin-top: 0;
+        font-size: 16px;
+        color: #aaa;
     }
 
-    /* MAIN AREA */
+    #sidebar a {
+        display: block;
+        color: #ccc;
+        text-decoration: none;
+        margin: 5px 0;
+        padding: 5px;
+        border-radius: 4px;
+    }
+
+    #sidebar a:hover {
+        background: #222;
+        color: #fff;
+    }
+
+    /* Main browser area */
     #main {
         flex: 1;
         display: flex;
         flex-direction: column;
-        height: 100vh;
     }
 
     .tab-bar {
@@ -125,26 +120,22 @@
     }
 </style>
 </head>
-
 <body>
 
-<!-- SIDEBAR -->
 <div id="sidebar">
-    <div class="side-link" onclick="loadInTab('https://google.com')">Google</div>
-    <div class="side-link" onclick="loadInTab('https://youtube.com')">YouTube</div>
-    <div class="side-link" onclick="loadInTab('https://github.com')">GitHub</div>
-    <div class="side-link" onclick="loadInTab('https://wikipedia.org')">Wikipedia</div>
-    <div class="side-link" onclick="loadInTab('https://www.startpage.com')">Search</div>
+    <h3>Quick Links</h3>
+    <a href="#" onclick="newTab('https://www.wikipedia.org')">Wikipedia</a>
+    <a href="#" onclick="newTab('https://www.reddit.com')">Reddit</a>
+    <a href="#" onclick="newTab('https://news.ycombinator.com')">Hacker News</a>
+    <a href="#" onclick="newTab('https://www.github.com')">GitHub</a>
 </div>
 
-<!-- MAIN BROWSER AREA -->
 <div id="main">
     <div class="tab-bar" id="tab-bar"></div>
 
     <div id="controls">
         <button onclick="newTab()">+</button>
-        <button onclick="goHome()">🏠</button>
-        <input type="text" id="url" placeholder="Enter URL or Search..." />
+        <input type="text" id="url" placeholder="Enter URL or search..." />
         <button onclick="goToURL()">Go</button>
     </div>
 
@@ -155,52 +146,8 @@
 let tabs = [];
 let currentTab = null;
 
-// HOMEPAGE WITH SHORTCUT GRID
-const HOMEPAGE = `data:text/html,
-<html>
-<head>
-<style>
-body {
-    background:#0f0f0f;
-    color:white;
-    font-family:Arial;
-    margin:0;
-    padding:20px;
-    text-align:center;
-}
-h1 { font-size:28px; }
-.grid {
-    display:grid;
-    grid-template-columns:repeat(auto-fit, minmax(150px, 1fr));
-    gap:20px;
-    padding:20px;
-}
-.card {
-    background:#1c1c1c;
-    padding:20px;
-    border-radius:10px;
-    cursor:pointer;
-    transition:0.2s;
-    font-size:18px;
-}
-.card:hover {
-    background:#333;
-    transform:scale(1.05);
-}
-</style>
-</head>
-<body>
-<h1>Welcome</h1>
-<div class="grid">
-    <div class="card" onclick="parent.loadInTab('https://google.com')">Google</div>
-    <div class="card" onclick="parent.loadInTab('https://youtube.com')">YouTube</div>
-    <div class="card" onclick="parent.loadInTab('https://github.com')">GitHub</div>
-    <div class="card" onclick="parent.loadInTab('https://wikipedia.org')">Wikipedia</div>
-    <div class="card" onclick="parent.loadInTab('https://www.startpage.com')">Startpage Search</div>
-</div>
-</body>
-</html>
-`;
+// Homepage URL that is embeddable
+const HOMEPAGE = "https://htmlpreview.github.io/?https://raw.githubusercontent.com/mdn/learning-area/master/html/introduction-to-html/hello-world.html";
 
 function newTab(url = HOMEPAGE) {
     const tabId = Date.now();
@@ -210,15 +157,14 @@ function newTab(url = HOMEPAGE) {
         url: url,
         iframe: document.createElement("iframe")
     };
-    tab.iframe.src = url;
 
+    tab.iframe.src = url;
     tabs.push(tab);
 
     const tabButton = document.createElement("div");
     tabButton.className = "tab";
     tabButton.id = "tab-" + tabId;
-    tabButton.innerHTML =
-        "Tab " + tabs.length +
+    tabButton.innerHTML = "Tab " + tabs.length +
         "<span class='close-btn' onclick='closeTab(event, " + tabId + ")'>×</span>";
     tabButton.onclick = () => switchTab(tabId);
 
@@ -230,7 +176,6 @@ function newTab(url = HOMEPAGE) {
 
 function switchTab(id) {
     currentTab = tabs.find(t => t.id === id);
-
     tabs.forEach(t => t.iframe.style.display = "none");
     currentTab.iframe.style.display = "block";
 
@@ -240,36 +185,29 @@ function switchTab(id) {
     document.getElementById("url").value = currentTab.url;
 }
 
-// Load a URL into the current tab
-function loadInTab(url) {
-    if (!currentTab) return;
-    currentTab.url = url;
-    currentTab.iframe.src = url;
-    document.getElementById("url").value = url;
-}
-
 function goToURL() {
     if (!currentTab) return;
 
     let input = document.getElementById("url").value.trim();
     let url;
 
-    // If input looks like a URL
-    if (input.startsWith("http")) url = input;
-    else if (input.includes(".")) url = "https://" + input;
-    // Otherwise treat as search using Startpage
-    else url = "https://www.startpage.com/sp/search?q=" + encodeURIComponent(input);
+    // Detect URL or search query
+    if (input.startsWith("http://") || input.startsWith("https://")) {
+        url = input;
+    } else if (input.includes(".")) {
+        url = "https://" + input;
+    } else {
+        // Use a custom embeddable search page
+        url = "https://htmlpreview.github.io/?https://raw.githubusercontent.com/mdn/learning-area/master/html/introduction-to-html/hello-world.html?q=" + encodeURIComponent(input);
+    }
 
-    loadInTab(url);
+    currentTab.url = url;
+    currentTab.iframe.src = url;
 }
 
 document.getElementById("url").addEventListener("keydown", e => {
     if (e.key === "Enter") goToURL();
 });
-
-function goHome() {
-    loadInTab(HOMEPAGE);
-}
 
 function closeTab(event, id) {
     event.stopPropagation();
@@ -278,15 +216,19 @@ function closeTab(event, id) {
     if (index === -1) return;
 
     const tab = tabs[index];
+
     tab.iframe.remove();
     document.getElementById("tab-" + id).remove();
+
     tabs.splice(index, 1);
 
-    if (tabs.length > 0) switchTab(tabs[0].id);
-    else currentTab = null;
+    if (currentTab && currentTab.id === id) {
+        if (tabs.length > 0) switchTab(tabs[0].id);
+        else currentTab = null;
+    }
 }
 
-// Start with one tab (homepage)
+// Start with homepage
 newTab();
 </script>
 
